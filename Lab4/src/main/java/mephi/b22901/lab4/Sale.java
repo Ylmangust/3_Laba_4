@@ -11,15 +11,33 @@ package mephi.b22901.lab4;
 public class Sale {
 
     private int saleId;
-    private int custId;
-    private int wandId;
+    private String custName;
+    private String wandName;
     private String date;
 
-    public Sale(int saleId, int custId, int wandId, String date) {
+    public Sale(int saleId, String custName, String wandName, String date) {
         this.saleId = saleId;
-        this.custId = custId;
-        this.wandId = wandId;
+        this.custName = custName;
+        this.wandName = wandName;
         this.date = date;
     }
+
+    public int getSaleId() {
+        return saleId;
+    }
+
+    public String getCustName() {
+        return custName;
+    }
+
+    public String getWandName() {
+        return wandName;
+    }
+
+    public String getDate() {
+        return date;
+    }
+    
+    
 
 }

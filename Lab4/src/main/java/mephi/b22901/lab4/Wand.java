@@ -13,13 +13,17 @@ public class Wand {
     private int woodId;
     private int coreId;
     private boolean isSold;
+    private String woodName;
+    private String coreName;
 
 
-    public Wand(int id, int woodId, int coreId, boolean isSold) {
+    public Wand(int id, int woodId, int coreId, boolean isSold, String wood, String core) {
         this.id = id;
         this.woodId = woodId;
         this.coreId = coreId;
         this.isSold = isSold;
+        this.woodName = wood;
+        this.coreName = core;
     }
 
     public int getId() {
@@ -36,6 +40,11 @@ public class Wand {
 
     public boolean getIsSold() {
         return isSold;
+    }
+    
+    @Override
+    public String toString(){
+        return woodName + "+" + coreName;
     }
     
     

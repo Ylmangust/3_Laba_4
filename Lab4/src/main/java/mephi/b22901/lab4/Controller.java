@@ -26,20 +26,20 @@ public class Controller {
         operation.addPerson(name, address);
     }
     
-    public void addNewWand(){
-        
+    public void addNewWand(Component wood, Component core){
+        operation.addNewWand(wood, core);
     }
     
     public void addNewSupply(LocalDate date, List <Integer> id){
         operation.addNewSupply(date, id);
     }
     
-    public void clear() {
-        operation.clearData();
+    public void addNewSale(int customerID, int wandID, LocalDate date){
+        operation.addNewSale(customerID, wandID, date);
     }
     
-    public List<Wand> getWands(){
-        return operation.getWands();
+    public void clear() {
+        operation.clearData();
     }
     
     public List<Customer> getCustomers(){
@@ -52,5 +52,13 @@ public class Controller {
     
     public List<Wand> getWandsAvaliable(){
         return operation.getWandsAvaliable();
+    }
+    
+    public List<Component> getCompsAvaliable(){
+        return operation.getComponentsAvaliable();
+    }
+    
+    public List <Sale> getSalesHistory(){
+        return operation.getSales();
     }
 }

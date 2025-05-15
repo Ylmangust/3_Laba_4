@@ -12,7 +12,9 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -49,18 +51,35 @@ public class GUI extends JFrame {
 
         JPanel storagePanel = new JPanel();
         storagePanel.setLayout(new BoxLayout(storagePanel, BoxLayout.Y_AXIS));
-        JButton checkBtn = new JButton("Проверить склад");
+        JButton supplyBtn = new JButton("Совершить поставку");
         JButton addWandBtn = new JButton("Создать палочку");
-        JButton avaliableWandsBtn = new JButton("Доступные палочки");
-        checkBtn.setAlignmentX(CENTER_ALIGNMENT);
+        JButton checkBtn = new JButton("Состояние склада");
+        supplyBtn.setAlignmentX(CENTER_ALIGNMENT);
         addWandBtn.setAlignmentX(CENTER_ALIGNMENT);
-        avaliableWandsBtn.setAlignmentX(CENTER_ALIGNMENT);
+        checkBtn.setAlignmentX(CENTER_ALIGNMENT);
+
+        supplyBtn.addActionListener((e) -> {
+            newSupply(controller.getStorage());
+        });
+
+        addWandBtn.addActionListener((e) -> {
+            if (controller.getCompsAvaliable().isEmpty()) {
+                JOptionPane.showMessageDialog(null, "Склад пуст, необходимы поставки!", null, JOptionPane.WARNING_MESSAGE);
+            } else {
+                addWand(controller.getCompsAvaliable());
+            }
+        });
+
+        checkBtn.addActionListener((e) -> {
+            storageInfo(controller.getStorage());
+
+        });
 
         storagePanel.add(checkBtn);
         storagePanel.add(Box.createVerticalGlue());
-        storagePanel.add(addWandBtn);
+        storagePanel.add(supplyBtn);
         storagePanel.add(Box.createVerticalGlue());
-        storagePanel.add(avaliableWandsBtn);
+        storagePanel.add(addWandBtn);
         storagePanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
         JPanel shopPanel = new JPanel();
@@ -82,121 +101,209 @@ public class GUI extends JFrame {
         splitPane.setLeftComponent(storagePanel);
         splitPane.setRightComponent(shopPanel);
 
-        checkBtn.addActionListener((e) -> {
-            newSupply(controller.getStorage());
-            if (controller.getStorage() == null) {
-                JOptionPane.showMessageDialog(null, "Склад пуст, необходимы поставки!", null, JOptionPane.WARNING_MESSAGE);
-            }
-        });
-
-        addWandBtn.addActionListener((e) -> {
-            if (controller.getStorage() == null) {
-                JOptionPane.showMessageDialog(null, "Склад пуст, необходимы поставки!", null, JOptionPane.WARNING_MESSAGE);
-            } else {
-                addWand();
-            }
-        });
-
-        avaliableWandsBtn.addActionListener((e) -> {
-            List<Wand> wands = controller.getWandsAvaliable();
-            if ((wands == null) || wands.isEmpty()) {
-                JOptionPane.showMessageDialog(null, "Доступных на складе нет, сначала создайте их!", null, JOptionPane.WARNING_MESSAGE);
-            } else {
-                showWands(wands);
-            }
-        });
-
         sellBtn.addActionListener((e) -> {
             List<Wand> wands = controller.getWandsAvaliable();
             if ((wands == null) || wands.isEmpty()) {
                 JOptionPane.showMessageDialog(null, "Палочек на складе нет, сначала создайте их!", null, JOptionPane.WARNING_MESSAGE);
             } else {
-                sellWand();
+                newPersonFrame();
+            }
+        });
+
+        salesHistoryBtn.addActionListener((e) -> {
+            List<Sale> sales = controller.getSalesHistory();
+            if (sales == null || sales.isEmpty()) {
+                JOptionPane.showMessageDialog(null, "Зарегистрированных продаж нет!", null, JOptionPane.WARNING_MESSAGE);
+            } else {
+                showSalesHistory(sales);
             }
         });
 
         clearBtn.addActionListener((e) -> {
-            controller.clear();
-        });
+            int choice = JOptionPane.showConfirmDialog(null, "Действие невозможно отменить. Вы уверены?", null, JOptionPane.YES_NO_OPTION);
+            if (choice == JOptionPane.YES_OPTION) {
+                controller.clear();
+            }
+        }
+        );
 
         splitPane.setDividerLocation(225);
         frame.add(splitPane);
-        pack();
         frame.setVisible(true);
         frame.setLocationRelativeTo(null);
     }
 
-    private void sellWand() {
-        int choice = JOptionPane.showConfirmDialog(null, "Клиент совершает покупку впервые?", null, JOptionPane.YES_NO_OPTION);
-        if (choice == JOptionPane.YES_OPTION) {
-            JFrame frame = new JFrame("Внесение данных о новом клиенте");
-            frame.setSize(350, 200);
-            JPanel panel = new JPanel();
-            panel.setLayout(new GridLayout(2, 0));
+    private void sellWand(List<Wand> wands, List<Customer> clients) {
+        if (clients != null) {
+            JFrame frame = new JFrame("Продажа палочки");
+            frame.setSize(450, 200);
 
-            JLabel nameLabel = new JLabel("Полное имя: ");
-            JTextField nameValue = new JTextField(20);
-            nameValue.setBorder(new LineBorder(Color.BLACK));
-            panel.add(nameLabel);
-            panel.add(nameValue);
+            Object[] customers = clients.toArray(new Customer[0]);
+            Object[] wandList = wands.toArray(new Wand[0]);
 
-            JLabel addressLabel = new JLabel("Адрес: ");
-            JTextField addressValue = new JTextField(20);
-            addressValue.setBorder(new LineBorder(Color.BLACK));
-            panel.add(addressLabel);
-            panel.add(addressValue);
+            JComboBox customerOptions = new JComboBox(customers);
+            JLabel customerLabel = new JLabel("Покупатель: ");
+            JPanel peoplePanel = new JPanel();
+            peoplePanel.setLayout(new GridLayout(0, 2));
+            peoplePanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+            peoplePanel.add(customerLabel);
+            peoplePanel.add(customerOptions);
 
-            panel.setBorder(BorderFactory.createEmptyBorder(10, 20, 5, 20));
+            JComboBox wandOptions = new JComboBox(wandList);
+            JLabel wandLabel = new JLabel("Палочка: ");
+            JPanel wandPanel = new JPanel();
+            wandPanel.setLayout(new GridLayout(0, 2));
+            wandPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+            wandPanel.add(wandLabel);
+            wandPanel.add(wandOptions);
+
+            JPanel btnPanel = new JPanel();
+            JButton okBtn = new JButton("Продать");
+            okBtn.addActionListener((e) -> {
+                Customer customer = (Customer) customerOptions.getSelectedItem();
+                Wand wand = (Wand) wandOptions.getSelectedItem();
+                LocalDate date = LocalDate.now();
+                controller.addNewSale(customer.getID(), wand.getId(), date);
+                JOptionPane.showMessageDialog(null, "Факт продажи успешно зафиксирован!", null, JOptionPane.INFORMATION_MESSAGE);
+                frame.dispose();
+            });
+            btnPanel.add(okBtn);
+            btnPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+            JPanel centerPanel = new JPanel();
+            centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS));
+            centerPanel.add(peoplePanel);
+            centerPanel.add(wandPanel);
+            frame.add(centerPanel, BorderLayout.CENTER);
+            frame.add(btnPanel, BorderLayout.SOUTH);
+            frame.pack();
+            frame.setVisible(true);
+            frame.setLocationRelativeTo(null);
+        } else {
+            JOptionPane.showMessageDialog(null, "Список клиентов пуст!", null, JOptionPane.WARNING_MESSAGE);
+        }
+    }
+
+    private void addWand(List<Component> comps) {
+        JFrame frame = new JFrame("Добавление новой палочки");
+        frame.setSize(350, 200);
+
+        JPanel panelWood = new JPanel();
+        panelWood.setLayout(new GridLayout(0, 2));
+        panelWood.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+        JPanel panelCore = new JPanel();
+        panelCore.setLayout(new GridLayout(0, 2));
+        panelCore.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+        JPanel centerPanel = new JPanel();
+        centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS));
+
+        Map<Integer, Component> core = new HashMap<>();
+        Map<Integer, Component> wood = new HashMap<>();
+
+        for (int i = 0; i < comps.size(); i++) {
+            if (comps.get(i).getId() < 25) {
+                wood.put(comps.get(i).getId(), comps.get(i));
+            } else {
+                core.put(comps.get(i).getId(), comps.get(i));
+            }
+        }
+
+        if (!wood.isEmpty() && !core.isEmpty()) {
+            Object[] woodOptions = wood.values().toArray(new Component[0]);
+            Object[] coreOptions = core.values().toArray(new Component[0]);
+
+            JComboBox woodValues = new JComboBox(woodOptions);
+            JLabel woodLabel = new JLabel("Корпус: ");
+
+            JComboBox coreValues = new JComboBox(coreOptions);
+            JLabel coreLabel = new JLabel("Сердцевины: ");
+
+            panelWood.add(woodLabel);
+            panelWood.add(woodValues);
+            panelCore.add(coreLabel);
+            panelCore.add(coreValues);
 
             JPanel btnPanel = new JPanel();
             JButton okBtn = new JButton("Сохранить");
             okBtn.addActionListener((e) -> {
-                controller.addNewPerson(nameValue.getText(), addressValue.getText());
-                frame.dispose();
+                Component selectedCore = (Component) coreValues.getSelectedItem();
+                Component selectedWood = (Component) woodValues.getSelectedItem();
+                if (selectedCore != null && selectedWood != null) {
+                    controller.addNewWand(selectedWood, selectedCore);
+                    frame.dispose();
+                } else {
+                    JOptionPane.showMessageDialog(null, "Необходимо выбрать оба компонента!", null, JOptionPane.WARNING_MESSAGE);
+                }
             });
             btnPanel.add(okBtn);
+            btnPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-            frame.add(panel, BorderLayout.CENTER);
+            centerPanel.add(panelWood);
+            centerPanel.add(panelCore);
+            frame.add(centerPanel, BorderLayout.CENTER);
             frame.add(btnPanel, BorderLayout.SOUTH);
-
+            frame.pack();
             frame.setVisible(true);
             frame.setLocationRelativeTo(null);
+        } else {
+            JOptionPane.showMessageDialog(null, "Недостаточно компонентов, пополните склад!", null, JOptionPane.WARNING_MESSAGE);
         }
 
     }
 
-    private void addWand() {
-        JFrame frame = new JFrame("Добавление новой палочки");
-        frame.setSize(350, 200);
+    private void newPersonFrame() {
+        int choice = JOptionPane.showConfirmDialog(null, "Клиент совершает покупку впервые?", null, JOptionPane.YES_NO_OPTION);
+        if (choice == JOptionPane.YES_OPTION) {
+            JFrame frame = new JFrame("Внесение данных о новом клиенте");
+            frame.setSize(350, 200);
+            JPanel namePanel = new JPanel();
+            namePanel.setLayout(new GridLayout(0, 2));
+            namePanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
 
-        JPanel panel = new JPanel();
-        panel.setLayout(new GridLayout(2, 0));
-        String[] woodOptions = {};
-        JComboBox woodValues = new JComboBox(woodOptions);
-        JLabel woodLabel = new JLabel("Корпус: ");
+            JLabel nameLabel = new JLabel("Полное имя: ");
+            JTextField nameValue = new JTextField(20);
+            nameValue.setBorder(new LineBorder(Color.BLACK));
+            namePanel.add(nameLabel);
+            namePanel.add(nameValue);
 
-        String[] coreOptions = {};
-        JComboBox coreValues = new JComboBox(coreOptions);
-        JLabel coreLabel = new JLabel("Сердцевины: ");
+            JPanel addressPanel = new JPanel();
+            addressPanel.setLayout(new GridLayout(0, 2));
+            addressPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
 
-        panel.add(woodLabel);
-        panel.add(woodValues);
-        panel.add(coreLabel);
-        panel.add(coreValues);
+            JLabel addressLabel = new JLabel("Адрес: ");
+            JTextField addressValue = new JTextField(20);
+            addressValue.setBorder(new LineBorder(Color.BLACK));
+            addressPanel.add(addressLabel);
+            addressPanel.add(addressValue);
 
-        JPanel btnPanel = new JPanel();
-        JButton okBtn = new JButton("Сохранить");
-        okBtn.addActionListener((e) -> {
-            controller.addNewWand();
-            frame.dispose();
-        });
-        btnPanel.add(okBtn);
+            JPanel centerPanel = new JPanel();
+            centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS));
+            centerPanel.add(namePanel);
+            centerPanel.add(addressPanel);
 
-        frame.setVisible(true);
-        frame.setLocationRelativeTo(null);
+            JPanel btnPanel = new JPanel();
+            btnPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+            JButton okBtn = new JButton("Сохранить");
+            okBtn.addActionListener((e) -> {
+                controller.addNewPerson(nameValue.getText(), addressValue.getText());
+                frame.dispose();
+                sellWand(controller.getWandsAvaliable(), controller.getCustomers());
+            });
+            btnPanel.add(okBtn);
+
+            frame.add(centerPanel, BorderLayout.CENTER);
+            frame.add(btnPanel, BorderLayout.SOUTH);
+            pack();
+            frame.setVisible(true);
+            frame.setLocationRelativeTo(null);
+        } else {
+            sellWand(controller.getWandsAvaliable(), controller.getCustomers());
+        }
     }
 
-    private void showWands(List<Wand> wands) {
+    /* private void showWands(List<Wand> wands) {
         JFrame frame = new JFrame("Доступные палочки");
         frame.setSize(450, 200);
 
@@ -228,8 +335,7 @@ public class GUI extends JFrame {
 
         frame.setVisible(true);
         frame.setLocationRelativeTo(null);
-    }
-
+    }*/
     private void newSupply(List<Component> storage) {
         JFrame frame = new JFrame("Выбор компонентов для поставки");
         frame.setSize(600, 200);
@@ -244,7 +350,6 @@ public class GUI extends JFrame {
             data[i][3] = component.getQuantity();
         }
 
-        // Кастомный TableModel чтобы первый столбец был Boolean
         DefaultTableModel model = new DefaultTableModel(data, columnNames) {
             @Override
             public Class<?> getColumnClass(int column) {
@@ -289,7 +394,6 @@ public class GUI extends JFrame {
                     }
                 }
                 if (selectedCount > 15) {
-
                     model.setValueAt(Boolean.FALSE, lastRowChanged, 0);
                     JOptionPane.showMessageDialog(frame, "Можно выбрать не более 15 компонентов!", null, JOptionPane.WARNING_MESSAGE
                     );
@@ -306,7 +410,7 @@ public class GUI extends JFrame {
 
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
-        JButton selectBtn = new JButton("Получить выбранные ID");
+        JButton selectBtn = new JButton("Подтвердить поставку");
         selectBtn.addActionListener(e -> {
             LocalDate date = null;
             try {
@@ -319,9 +423,14 @@ public class GUI extends JFrame {
                         selectedID.add(id);
                     }
                 }
-                controller.addNewSupply(date, selectedID);
-                frame.dispose();
-                JOptionPane.showMessageDialog(frame, "Поставка прошла успешно, компоненты доставлены на склад.", null, JOptionPane.INFORMATION_MESSAGE);
+                if (!selectedID.isEmpty()) {
+                    controller.addNewSupply(date, selectedID);
+                    JOptionPane.showMessageDialog(frame, "Поставка прошла успешно, компоненты доставлены на склад.", null, JOptionPane.INFORMATION_MESSAGE);
+                    frame.dispose();
+                } else {
+                    JOptionPane.showMessageDialog(frame, "Компоненты не были выбраны, поставка не реализована.", null, JOptionPane.WARNING_MESSAGE);
+                }
+
             } catch (DateTimeParseException ex) {
                 JOptionPane.showMessageDialog(frame, "Дата не соотвествует формату ГГГГ-ММ-ДД", null, JOptionPane.WARNING_MESSAGE);
             }
@@ -335,11 +444,80 @@ public class GUI extends JFrame {
         southPanel.add(buttonPanel);
         buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         datePanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 180));
-
         frame.add(scrollPane, BorderLayout.CENTER);
         frame.add(southPanel, BorderLayout.SOUTH);
         frame.pack();
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
+    }
+
+    private void storageInfo(List<Component> components) {
+        JFrame frame = new JFrame("Состояние склада");
+        frame.setSize(600, 400);
+
+        String[] columnNames = {"ID", "Компонент", "Количество на складе"};
+        Object[][] data = new Object[components.size()][3];
+        for (int i = 0; i < components.size(); i++) {
+            Component component = components.get(i);
+            data[i][0] = component.getId();
+            data[i][1] = component.getName();
+            data[i][2] = component.getQuantity();
+        }
+
+        JTable table = new JTable(data, columnNames) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+        centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
+
+        for (int i = 0; i < columnNames.length; i++) {
+            table.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
+        }
+        table.getColumnModel().getColumn(0).setPreferredWidth(5);
+        JScrollPane scrollPane = new JScrollPane(table);
+        scrollPane.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        frame.add(scrollPane);
+        frame.pack();
+        frame.setVisible(true);
+        frame.setLocationRelativeTo(null);
+    }
+
+    private void showSalesHistory(List<Sale> sales) {
+        JFrame frame = new JFrame("История продаж");
+        frame.setSize(700, 400);
+
+        String[] columnNames = {"ID", "Покупатель", "Палочка", "Дата продажи"};
+        Object[][] data = new Object[sales.size()][4];
+        for (int i = 0; i < sales.size(); i++) {
+            Sale sale = sales.get(i);
+            data[i][0] = sale.getSaleId();
+            data[i][1] = sale.getCustName();
+            data[i][2] = sale.getWandName();
+            data[i][3] = sale.getDate();
+        }
+
+        JTable table = new JTable(data, columnNames) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+        centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
+
+        for (int i = 0; i < columnNames.length; i++) {
+            table.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
+        }
+        table.getColumnModel().getColumn(0).setPreferredWidth(5);
+        table.getColumnModel().getColumn(2).setPreferredWidth(100);
+        JScrollPane scrollPane = new JScrollPane(table);
+        scrollPane.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        frame.add(scrollPane);
+        //pack();
+        frame.setVisible(true);
+        frame.setLocationRelativeTo(null);
     }
 }

@@ -19,5 +19,14 @@ public class Customer {
         this.name = name;
         this.address = addres;
     }
+    
+    public int getID(){
+        return id;
+    }
+    
+    @Override
+    public String toString(){
+        return name;
+    }
 
 }
