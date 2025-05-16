@@ -2,29 +2,40 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package mephi.b22901.lab4;
+package Model;
 
 /**
  *
  * @author Регина
  */
-public class Customer {
-
+public class Component {
+    
     private int id;
     private String name;
-    private String address;
+    private int quantity;
 
-    public Customer(int id, String name, String addres) {
+    public Component(int id, String name, int quantity) {
         this.id = id;
         this.name = name;
-        this.address = addres;
+        this.quantity = quantity;
     }
-    
-    public int getID(){
+
+    public int getId() {
         return id;
     }
+
+    public String getName() {
+        return name;
+    }
+
+    public int getQuantity() {
+        return quantity;
+    }
+
     
-    @Override
+    
+    
+    @Override 
     public String toString(){
         return name;
     }

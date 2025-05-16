@@ -2,8 +2,13 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package mephi.b22901.lab4;
+package View;
 
+import Model.Component;
+import Model.Customer;
+import Model.Sale;
+import Model.Wand;
+import Controller.Controller;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.FlowLayout;
