@@ -11,9 +11,9 @@ package Model;
 public class Supply {
     private int id;
     private String date;
-    private int component;
+    private String component;
 
-    public Supply(int id, String date, int component) {
+    public Supply(int id, String date, String component) {
         this.id = id;
         this.date = date;
         this.component = component;

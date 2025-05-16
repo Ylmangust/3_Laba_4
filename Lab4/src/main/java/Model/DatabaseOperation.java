@@ -161,12 +161,12 @@ public class DatabaseOperation {
                 supplies.clear();
             }
             supplies = new ArrayList<>();
-            String querySupply = "SELECT id_supply, date, components FROM supplies";
+            String querySupply = "SELECT s.id_supply, s.date, st.name AS component FROM supplies s JOIN storage st ON s.components = st.id_component";
             try (PreparedStatement statement = connection.prepareStatement(querySupply); ResultSet resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
                     int id = resultSet.getInt("id_supply");
                     String date = resultSet.getString("date");
-                    int component = resultSet.getInt("components");
+                    String component = resultSet.getString("component");
                     supplies.add(new Supply(id, date, component));
                 }
             } catch (SQLException e) {

@@ -4,10 +4,8 @@
  */
 package Controller;
 
-import java.sql.Date;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Map;
 import Model.Component;
 import Model.Customer;
 import Model.DatabaseOperation;

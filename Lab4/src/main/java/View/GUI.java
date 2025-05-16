@@ -307,40 +307,6 @@ public class GUI extends JFrame {
             sellWand(controller.getWandsAvaliable(), controller.getCustomers());
         }
     }
-
-    /* private void showWands(List<Wand> wands) {
-        JFrame frame = new JFrame("Доступные палочки");
-        frame.setSize(450, 200);
-
-        String[] columnNames = {"ID", "Древесина", "Сердцевина"};
-        Object[][] data = new Object[wands.size()][3];
-        for (int i = 0; i < wands.size(); i++) {
-            Wand w = wands.get(i);
-            data[i][0] = w.getId();
-            data[i][1] = WandsComponents.getComponent(w.getWoodId());
-            data[i][2] = WandsComponents.getComponent(w.getCoreId());
-        }
-
-        JTable table = new JTable(data, columnNames) {
-            @Override
-            public boolean isCellEditable(int row, int column) {
-                return false;
-            }
-        };
-        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
-        centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
-
-        for (int i = 0; i < columnNames.length; i++) {
-            table.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
-        }
-        table.getColumnModel().getColumn(0).setPreferredWidth(5);
-        JScrollPane scrollPane = new JScrollPane(table);
-
-        frame.add(scrollPane);
-
-        frame.setVisible(true);
-        frame.setLocationRelativeTo(null);
-    }*/
     private void newSupply(List<Component> storage) {
         JFrame frame = new JFrame("Выбор компонентов для поставки");
         frame.setSize(600, 200);
@@ -521,7 +487,6 @@ public class GUI extends JFrame {
         JScrollPane scrollPane = new JScrollPane(table);
         scrollPane.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         frame.add(scrollPane);
-        //pack();
         frame.setVisible(true);
         frame.setLocationRelativeTo(null);
     }
