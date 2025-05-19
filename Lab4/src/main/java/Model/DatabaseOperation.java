@@ -26,12 +26,12 @@ public class DatabaseOperation {
     private final String password = "@Mechanic%2925";
     private String[] tables = {"supplies", "sales", "customers", "wands", "storage"};
     private String[] fKeys = {"id_supply", "id_sale", "id_client", "id_wand", "id_component"};
-    private Connection connection = null;
-    private List<Customer> customers = null;
-    private List<Wand> wands = null;
-    private List<Component> storage = null;
-    private List<Sale> sales = null;
-    private List<Supply> supplies = null;
+    private Connection connection;
+    private List<Customer> customers;
+    private List<Wand> wands;
+    private List<Component> storage;
+    private List<Sale> sales;
+    private List<Supply> supplies;
 
     public DatabaseOperation() {
         try {
@@ -86,6 +86,10 @@ public class DatabaseOperation {
             } catch (SQLException e) {
                 e.printStackTrace();
             }
+        }else{
+            if (customers != null) {
+                customers.clear();
+            }
         }
     }
 
@@ -117,6 +121,10 @@ public class DatabaseOperation {
                 }
             } catch (SQLException e) {
                 e.printStackTrace();
+            }
+        }else{
+            if (wands != null) {
+                wands.clear();
             }
         }
     }
@@ -151,7 +159,10 @@ public class DatabaseOperation {
             } catch (SQLException e) {
                 e.printStackTrace();
             }
-
+        }else{
+            if (sales != null) {
+                sales.clear();
+            }
         }
     }
 
@@ -171,6 +182,10 @@ public class DatabaseOperation {
                 }
             } catch (SQLException e) {
                 e.printStackTrace();
+            }
+        }else{
+            if (supplies != null) {
+                supplies.clear();
             }
         }
     }
@@ -304,7 +319,7 @@ public class DatabaseOperation {
         for (int i = 0; i < 5; i++) {
             if (!tableIsEmpty(tables[i]) && (i != 4)) {
                 try {
-                    String queryTable = "TRUNCATE " + tables[i] + " CASCADE";
+                    String queryTable = "DELETE FROM " + tables[i];
                     PreparedStatement statement = connection.prepareStatement(queryTable);
                     statement.executeUpdate();
                     try (PreparedStatement ps = connection.prepareStatement("SELECT pg_get_serial_sequence(?, ?)")) {
